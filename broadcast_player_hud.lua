@@ -44,7 +44,9 @@ local function hud_update(player, id, ticks, usecs)
 end
 
 local hud_enable = function(player)
-	players[player] = hud_setup(player)
+	if not players[player] then
+		players[player] = hud_setup(player)
+	end
 end
 local hud_disable = function(player)
 	local data = players[player]
