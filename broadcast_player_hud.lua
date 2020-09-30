@@ -1,4 +1,5 @@
 local huddef = {
+	name = "on-screen ticks per second counter",
 	type="text",
 	text="???",
 	-- this probably will upset someone but it's mostly for diagnostics anyway so...
