@@ -13,6 +13,9 @@ local huddef = {
 local hud_setup = function(player)
 	return player:hud_add(huddef)
 end
+local hud_remove = function(player, id)
+	player:hud_remove(id)
+end
 
 -- associative dictionary of players to the hud data as created by hud_setup().
 local players = {}
@@ -40,12 +43,58 @@ local function hud_update(player, id, ticks, usecs)
 	player:hud_change(id, "text", str)
 end
 
-
-
--- HAX
-minetest.register_on_joinplayer(function(player)
+local hud_enable = function(player)
 	players[player] = hud_setup(player)
+end
+local hud_disable = function(player)
+	local data = players[player]
+	if data then
+		hud_remove(player, data)
+		players[player] = nil
+	end
+end
+
+
+
+
+
+
+local name_hud = "tps_hud"
+local desc_hud = "Allows viewing server TPS stats in real time (may leak information about other players)"
+minetest.register_privilege(name_hud, {
+	description = desc_hud,
+})
+local cmd_hud = function(name, cmdline)
+	-- this could theoretically be called on a user's behalf but without them being in-game,
+	-- e.g. command blocks or certain IRC relays.
+	-- so fetching the player by name may fail.
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		return false, "# that player is not currently online."
+	end
+	if cmdline == "on" then
+		hud_enable(player)
+		return true
+	elseif cmdline == "off" then
+		hud_disable(player)
+		return true
+	else
+		return false, "# unrecognised argument: " .. cmdline
+	end
+end
+minetest.register_chatcommand(name_hud, {
+	description = "Controls visibility of the on-screen TPS HUD",
+	params = "<on|off>",
+	privs = {[name_hud] = true},
+	func = cmd_hud,
+})
+-- clean-up of stale player handles
+minetest.register_on_leaveplayer(function(player, timed_out)
+	hud_disable(player)
 end)
+
+
+
 
 
 
