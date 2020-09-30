@@ -62,7 +62,7 @@ end)
 
 
 
-local mp = minetest.get_modpath("sps_counter")
+local mp = minetest.get_modpath("tps_counter")
 -- TODO: this is useful, I should throw this in my prelude mod...
 local dofilex = function(name, ...)
 	local c, err = loadfile(mp .. "/" .. name)
